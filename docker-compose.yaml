@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+
+  pokedex:
+    container_name: pokedex
+    env_file: .env
+    ports:
+      - ${BUSINESS_PORT_HOST}:${BUSINESS_PORT_DOCKER}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - './:/usr/pokedex/app/'
+      - 'data-files:/home/pokedex/data'
+    depends_on:
+      - "mongodb"
+    networks:
+      - production-network
+
+  mongodb:
+    image: mongo:4.4.1
+    restart: always
+    container_name: pokedex-db
+    env_file: .env
+    ports:
+      - ${MONGODB_BEGIN_HOST}:${MONGODB_END_HOST}:${MONGODB_BEGIN_DOCKER}:${MONGODB_BEGIN_HOST}
+    volumes:
+      - db-data:/data/db
+    networks:
+      - production-network
+
+volumes:
+  db-data:
+  data-files:
+
+networks:
+  production-network:
+    driver: bridge
+
